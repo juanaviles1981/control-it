@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import jobRoutes from './routes/jobs.js';
 import inventoryRoutes from './routes/inventory.js';
+import metaRoutes from './routes/meta.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/jobs', jobRoutes);
 app.use('/api/inventory', inventoryRoutes);
+app.use('/api/meta', metaRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

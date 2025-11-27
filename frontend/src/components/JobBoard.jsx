@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const JobBoard = () => {
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    // Fetch jobs from API
-    // fetch('http://localhost:3000/api/jobs').then(...)
+    fetch('http://localhost:3000/api/jobs')
+      .then(res => res.json())
+      .then(data => setJobs(data))
+      .catch(err => console.error('Error fetching jobs:', err));
   }, []);
 
   return (
     <div className="flex flex-col">
+      <div className="mb-4 flex justify-end">
+        <Link to="/jobs/new" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          Nuevo Trabajo
+        </Link>
+      </div>
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
           <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -31,23 +39,24 @@ const JobBoard = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {/* Map jobs here */}
-                <tr>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">Ejemplo de Trabajo</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      Completado
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    2023-10-27
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="#" className="text-indigo-600 hover:text-indigo-900">Editar</a>
-                  </td>
-                </tr>
+                {jobs.map((job) => (
+                  <tr key={job.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{job.title}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {job.status.name}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(job.date).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <Link to={`/jobs/${job.id}/edit`} className="text-indigo-600 hover:text-indigo-900">Editar</Link>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
