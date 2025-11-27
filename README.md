@@ -1,6 +1,6 @@
 # Control IT - Sistema de Gestión de Servicios IT
 
-Sistema web completo para la gestión de trabajos de servicios IT con control automático de inventario.
+Sistema web completo para la gestión de trabajos de servicios IT con autenticación de usuarios, control automático de inventario y dashboard en tiempo real.
 
 ## 🚀 Tecnologías Utilizadas
 
@@ -23,7 +23,35 @@ Sistema web completo para la gestión de trabajos de servicios IT con control au
 - **ESLint** - Linter para JavaScript
 - **Prisma Studio** - GUI para explorar la base de datos
 
+## 🔐 Sistema de Autenticación
+
+### Credenciales por Defecto
+- **Usuario**: `admin`
+- **Contraseña**: `admin123`
+
+### Funcionalidades de Autenticación
+- ✅ **Login** - Inicio de sesión con usuario y contraseña
+- ✅ **Registro** - Crear nuevas cuentas de usuario (todos son admin)
+- ✅ **Recuperación de contraseña** - Restablecer contraseña olvidada
+- ✅ **Tokens JWT** - Sesiones seguras con expiración de 24 horas
+- ✅ **Rutas protegidas** - Todas las funcionalidades requieren autenticación
+- ✅ **Persistencia de sesión** - Sesión guardada en localStorage
+- ✅ **Logout** - Botón para cerrar sesión en navbar
+
+### Rutas de Autenticación
+- `/login` - Iniciar sesión
+- `/register` - Crear nueva cuenta
+- `/forgot-password` - Restablecer contraseña
+
 ## 📋 Funcionalidades
+
+### Autenticación y Seguridad
+- ✅ Login con usuario y contraseña
+- ✅ Registro de nuevos usuarios
+- ✅ Recuperación de contraseña
+- ✅ Sesiones seguras con JWT
+- ✅ Contraseñas encriptadas con bcrypt
+- ✅ Protección de todas las rutas
 
 ### Gestión de Trabajos
 - ✅ Crear trabajos con título, descripción, fecha, estado y tipo de servicio
@@ -140,11 +168,36 @@ Prisma Studio estará disponible en `http://localhost:5555`
 
 ## 📖 Guía de Uso
 
-### 1. Dashboard
+### 1. Autenticación
+
+#### Primera Vez (Registro)
+1. Abre la aplicación en `http://localhost:5173`
+2. Click en **"Crear cuenta"**
+3. Completa el formulario:
+   - Usuario (requerido)
+   - Email (opcional)
+   - Contraseña (mínimo 6 caracteres)
+   - Confirmar contraseña
+4. Click en **"Crear Cuenta"**
+5. Serás redirigido automáticamente al dashboard
+
+#### Usuario Existente (Login)
+1. Ingresa tus credenciales
+2. Click en **"Iniciar Sesión"**
+3. Acceso al sistema completo
+
+#### Olvidó su Contraseña
+1. Click en **"¿Olvidó su contraseña?"**
+2. Ingresa tu nombre de usuario
+3. Establece una nueva contraseña
+4. Confirma la nueva contraseña
+5. Vuelve al login e ingresa con la nueva contraseña
+
+### 2. Dashboard
 - Accede a `/` para ver las estadísticas en tiempo real
 - Visualiza trabajos pendientes, insumos bajos y trabajos completados
 
-### 2. Gestión de Trabajos
+### 3. Gestión de Trabajos
 
 #### Crear un Trabajo
 1. Navega a **Trabajos** → **Nuevo Trabajo**
@@ -166,7 +219,7 @@ Prisma Studio estará disponible en `http://localhost:5555`
 3. El stock se ajustará automáticamente
 4. Click en **Guardar**
 
-### 3. Gestión de Inventario
+### 4. Gestión de Inventario
 
 #### Agregar Ítem
 1. Navega a **Inventario** → **Agregar Ítem**
@@ -216,21 +269,42 @@ Usuario → Formulario → PUT /api/jobs/:id
 
 ## 🔌 API Endpoints
 
-### Trabajos
+### Autenticación (Públicas)
+- `POST /api/auth/login` - Iniciar sesión
+- `POST /api/auth/register` - Registrar nuevo usuario (admin por defecto)
+- `POST /api/auth/reset-password` - Restablecer contraseña
+- `GET /api/auth/me` - Obtener información del usuario actual
+
+### Trabajos (Protegidas - Requieren JWT)
 - `GET /api/jobs` - Lista todos los trabajos
 - `GET /api/jobs/:id` - Obtiene un trabajo específico
 - `POST /api/jobs` - Crea un nuevo trabajo
 - `PUT /api/jobs/:id` - Actualiza un trabajo
 
-### Inventario
+### Inventario (Protegidas - Requieren JWT)
 - `GET /api/inventory` - Lista todos los ítems
 - `POST /api/inventory` - Agrega un nuevo ítem
 
-### Metadata
+### Metadata (Protegidas - Requieren JWT)
 - `GET /api/meta/statuses` - Lista estados disponibles
 - `GET /api/meta/service-types` - Lista tipos de servicio
 
+> **Nota**: Las rutas protegidas requieren el header `Authorization: Bearer <token>`
+
 ## 🗄️ Modelo de Datos
+
+### User (Usuario)
+```javascript
+{
+  id: Int,
+  username: String (unique),
+  password: String (hashed),
+  email: String?,
+  role: String (default: "admin"),
+  createdAt: DateTime,
+  updatedAt: DateTime
+}
+```
 
 ### Job (Trabajo)
 ```javascript
@@ -281,6 +355,11 @@ PORT=3000
 
 El script `seed.js` crea automáticamente:
 
+**Usuario por Defecto:**
+- Username: `admin`
+- Password: `admin123`
+- Role: `admin`
+
 **Estados:**
 - Pendiente
 - En Progreso
@@ -323,14 +402,18 @@ node seed.js
 
 ## 📝 Notas Importantes
 
+- **Autenticación Requerida**: Todas las funcionalidades requieren estar autenticado
+- **Usuarios Admin**: Todos los usuarios registrados tienen rol de administrador
+- **Sesión Persistente**: El token JWT se guarda en localStorage y expira en 24 horas
 - **Stock Automático**: El sistema descuenta automáticamente el stock al crear trabajos y lo restaura al editar
 - **Validación**: No se permite crear/editar trabajos si no hay stock suficiente
 - **Transacciones**: Todas las operaciones de stock usan transacciones para garantizar consistencia
 - **SQLite**: Base de datos local, ideal para desarrollo. Para producción considerar PostgreSQL o MySQL
+- **Seguridad**: Contraseñas hasheadas con bcrypt (10 rounds). Cambiar JWT_SECRET en producción
 
 ## 🚀 Próximas Mejoras
 
-- [ ] Autenticación de usuarios
+- [ ] Roles de usuario diferenciados (admin, técnico, viewer)
 - [ ] Reportes y gráficos
 - [ ] Exportación a PDF/Excel
 - [ ] Notificaciones de stock bajo

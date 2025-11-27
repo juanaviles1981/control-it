@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { apiRequest } from '../utils/api';
 
 const JobBoard = () => {
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/jobs')
+    apiRequest('/jobs')
       .then(res => res.json())
       .then(data => setJobs(data))
       .catch(err => console.error('Error fetching jobs:', err));

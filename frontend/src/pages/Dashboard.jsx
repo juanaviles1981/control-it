@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiRequest } from '../utils/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -11,8 +12,8 @@ const Dashboard = () => {
     const fetchStats = async () => {
       try {
         const [jobsRes, inventoryRes] = await Promise.all([
-          fetch('http://localhost:3000/api/jobs'),
-          fetch('http://localhost:3000/api/inventory')
+          apiRequest('/jobs'),
+          apiRequest('/inventory')
         ]);
 
         if (jobsRes.ok && inventoryRes.ok) {

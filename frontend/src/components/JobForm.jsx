@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { apiRequest } from '../utils/api';
 
 const JobForm = () => {
   const { id } = useParams();
@@ -21,9 +22,9 @@ const JobForm = () => {
     const fetchData = async () => {
       try {
         const [statusRes, serviceRes, inventoryRes] = await Promise.all([
-          fetch('http://localhost:3000/api/meta/statuses'),
-          fetch('http://localhost:3000/api/meta/service-types'),
-          fetch('http://localhost:3000/api/inventory')
+          apiRequest('/meta/statuses'),
+          apiRequest('/meta/service-types'),
+          apiRequest('/inventory')
         ]);
 
         if (statusRes.ok) setStatuses(await statusRes.json());
@@ -32,7 +33,7 @@ const JobForm = () => {
 
         // If edit mode, fetch job details
         if (isEditMode) {
-          const jobRes = await fetch(`http://localhost:3000/api/jobs/${id}`);
+          const jobRes = await apiRequest(`/jobs/${id}`);
           if (jobRes.ok) {
             const job = await jobRes.json();
             setTitle(job.title);
@@ -84,17 +85,11 @@ const JobForm = () => {
     };
 
     try {
-      const url = isEditMode 
-        ? `http://localhost:3000/api/jobs/${id}`
-        : 'http://localhost:3000/api/jobs';
-      
+      const endpoint = isEditMode ? `/jobs/${id}` : '/jobs';
       const method = isEditMode ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
+      const response = await apiRequest(endpoint, {
         method: method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(payload),
       });
 

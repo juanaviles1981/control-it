@@ -1,5 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Login from './components/Login';
+import Register from './components/Register';
+import ForgotPassword from './components/ForgotPassword';
+import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import JobBoard from './components/JobBoard';
@@ -9,18 +14,32 @@ import InventoryForm from './components/InventoryForm';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Layout>
+    <AuthProvider>
+      <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/jobs" element={<JobBoard />} />
-          <Route path="/jobs/new" element={<JobForm />} />
-          <Route path="/jobs/:id/edit" element={<JobForm />} />
-          <Route path="/inventory" element={<InventoryTable />} />
-          <Route path="/inventory/new" element={<InventoryForm />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/jobs" element={<JobBoard />} />
+                    <Route path="/jobs/new" element={<JobForm />} />
+                    <Route path="/jobs/:id/edit" element={<JobForm />} />
+                    <Route path="/inventory" element={<InventoryTable />} />
+                    <Route path="/inventory/new" element={<InventoryForm />} />
+                  </Routes>
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      </Layout>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

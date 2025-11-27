@@ -44,6 +44,27 @@ async function main() {
     }
     console.log('Inventory Items seeded.');
 
+    // Seed default admin user
+    const bcrypt = await import('bcryptjs');
+    const hashedPassword = await bcrypt.default.hash('admin123', 10);
+    
+    const existingAdmin = await prisma.user.findUnique({
+      where: { username: 'admin' }
+    });
+
+    if (!existingAdmin) {
+      await prisma.user.create({
+        data: {
+          username: 'admin',
+          password: hashedPassword,
+          email: 'admin@control-it.com',
+          role: 'admin'
+        }
+      });
+      console.log('Default admin user created (username: admin, password: admin123)');
+    }
+
+
   } catch (e) {
     console.error(e);
     process.exit(1);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiRequest } from '../utils/api';
 
 const InventoryForm = () => {
   const navigate = useNavigate();
@@ -22,11 +23,8 @@ const InventoryForm = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/api/inventory', {
+      const response = await apiRequest('/inventory', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(payload),
       });
 

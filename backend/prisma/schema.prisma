@@ -51,3 +51,13 @@ model ServiceType {
   name  String @unique
   jobs  Job[]
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  email     String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

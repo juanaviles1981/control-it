@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { apiRequest } from '../utils/api';
 
 const InventoryTable = () => {
   const [inventory, setInventory] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/inventory')
+    apiRequest('/inventory')
       .then(res => res.json())
       .then(data => setInventory(data))
       .catch(err => console.error('Error fetching inventory:', err));
