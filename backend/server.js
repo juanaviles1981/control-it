@@ -1,12 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { PrismaClient } from '@prisma/client';
-import jobRoutes from './routes/jobs.js';
-import inventoryRoutes from './routes/inventory.js';
-import metaRoutes from './routes/meta.js';
-import authRoutes from './routes/auth.js';
-import { authMiddleware } from './middleware/auth.js';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { PrismaClient } from "@prisma/client";
+import jobRoutes from "./routes/jobs.js";
+import inventoryRoutes from "./routes/inventory.js";
+import metaRoutes from "./routes/meta.js";
+import authRoutes from "./routes/auth.js";
+import stockRequestRoutes from "./routes/stockRequests.js";
+import { authMiddleware } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -18,15 +19,16 @@ app.use(cors());
 app.use(express.json());
 
 // Health check
-app.get('/', (req, res) => {
-  res.send('IT Service Management API is running');
+app.get("/", (req, res) => {
+  res.send("IT Service Management API is running");
 });
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/jobs', authMiddleware, jobRoutes);
-app.use('/api/inventory', authMiddleware, inventoryRoutes);
-app.use('/api/meta', authMiddleware, metaRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/jobs", authMiddleware, jobRoutes);
+app.use("/api/inventory", authMiddleware, inventoryRoutes);
+app.use("/api/meta", authMiddleware, metaRoutes);
+app.use("/api/stock-requests", authMiddleware, stockRequestRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
