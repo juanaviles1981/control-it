@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { showSuccessToast, showErrorToast } from "../utils/notifications";
 import { apiRequest } from "../utils/api";
 
+import { motion } from "framer-motion";
+
 const StockRequestForm = () => {
   const navigate = useNavigate();
 
@@ -43,7 +45,12 @@ const StockRequestForm = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-4xl mx-auto"
+    >
       <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-indigo-500/10">
         <div className="px-8 py-6 border-b border-gray-200/50 bg-white/40">
           <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
@@ -168,7 +175,7 @@ const StockRequestForm = () => {
           </div>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

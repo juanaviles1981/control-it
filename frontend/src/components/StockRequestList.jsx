@@ -4,6 +4,8 @@ import DataTable from "react-data-table-component";
 import { apiRequest } from "../utils/api";
 import Swal from "sweetalert2";
 
+import { motion } from "framer-motion";
+
 const StockRequestList = () => {
   const [stockRequests, setStockRequests] = useState([]);
   const [filterText, setFilterText] = useState("");
@@ -244,7 +246,12 @@ const StockRequestList = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col"
+    >
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
           Pedidos de Stock
@@ -284,7 +291,7 @@ const StockRequestList = () => {
           pointerOnHover
         />
       </div>
-    </div>
+    </motion.div>
   );
 };
 

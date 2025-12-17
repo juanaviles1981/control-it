@@ -15,6 +15,8 @@ import StockRequestList from "./components/StockRequestList";
 import StockRequestForm from "./components/StockRequestForm";
 import UserManagement from "./components/UserManagement";
 import UserForm from "./components/UserForm";
+import EquipmentManagement from "./components/EquipmentManagement";
+import StatisticsDashboard from "./components/StatisticsDashboard";
 
 function App() {
   return (
@@ -46,6 +48,14 @@ function App() {
                     />
                     <Route path="/users" element={<UserManagement />} />
                     <Route path="/users/new" element={<UserForm />} />
+                    <Route
+                      path="/equipment"
+                      element={<EquipmentManagement />}
+                    />
+                    <Route
+                      path="/statistics"
+                      element={<StatisticsDashboard />}
+                    />
                   </Routes>
                 </Layout>
               </ProtectedRoute>

@@ -11,11 +11,14 @@ model Job {
   id            Int       @id @default(autoincrement())
   title         String
   description   String?
+  problemType   String?
   date          DateTime
   statusId      Int
   status        Status    @relation(fields: [statusId], references: [id])
   serviceTypeId Int
   serviceType   ServiceType @relation(fields: [serviceTypeId], references: [id])
+  equipmentId   Int?
+  equipment     Equipment?  @relation(fields: [equipmentId], references: [id])
   itemsUsed     JobItem[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -71,4 +74,23 @@ model User {
   role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Sector {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  rack      String?
+  equipment Equipment[]
+}
+
+model Equipment {
+  id            Int      @id @default(autoincrement())
+  name          String
+  anydeskNumber     String
+  computerType      String
+  connectionType    String? // "Cable", "WiFi"
+  connectionDetails String? // "Boca 24", "Switch A", "SSID Guest"
+  sectorId          Int
+  sector            Sector   @relation(fields: [sectorId], references: [id])
+  jobs          Job[]
 }

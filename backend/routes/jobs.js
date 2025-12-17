@@ -1,21 +1,22 @@
-import express from 'express';
-import { prisma } from '../server.js';
+import express from "express";
+import { prisma } from "../server.js";
 
 const router = express.Router();
 
 // Get all jobs
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const jobs = await prisma.job.findMany({
       include: {
         status: true,
         serviceType: true,
+        equipment: true,
         itemsUsed: {
           include: {
-            item: true
-          }
-        }
-      }
+            item: true,
+          },
+        },
+      },
     });
     res.json(jobs);
   } catch (error) {
@@ -24,7 +25,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get a single job
-router.get('/:id', async (req, res) => {
+router.get("/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const job = await prisma.job.findUnique({
@@ -32,15 +33,16 @@ router.get('/:id', async (req, res) => {
       include: {
         status: true,
         serviceType: true,
+        equipment: true,
         itemsUsed: {
           include: {
-            item: true
-          }
-        }
-      }
+            item: true,
+          },
+        },
+      },
     });
     if (!job) {
-      return res.status(404).json({ error: 'Job not found' });
+      return res.status(404).json({ error: "Job not found" });
     }
     res.json(job);
   } catch (error) {
@@ -49,21 +51,30 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update a job
-router.put('/:id', async (req, res) => {
+router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const { title, description, date, statusId, serviceTypeId, items } = req.body;
+  const {
+    title,
+    description,
+    problemType,
+    date,
+    statusId,
+    serviceTypeId,
+    equipmentId,
+    items,
+  } = req.body;
   try {
     const job = await prisma.$transaction(async (prisma) => {
       // 1. Get existing job with items to restore stock
       const existingJob = await prisma.job.findUnique({
         where: { id: Number(id) },
         include: {
-          itemsUsed: true
-        }
+          itemsUsed: true,
+        },
       });
 
       if (!existingJob) {
-        throw new Error('Job not found');
+        throw new Error("Job not found");
       }
 
       // 2. Restore stock for old items
@@ -72,9 +83,9 @@ router.put('/:id', async (req, res) => {
           where: { id: oldItem.itemId },
           data: {
             stock: {
-              increment: oldItem.quantity
-            }
-          }
+              increment: oldItem.quantity,
+            },
+          },
         });
       }
 
@@ -82,15 +93,17 @@ router.put('/:id', async (req, res) => {
       if (items && items.length > 0) {
         for (const item of items) {
           const inventoryItem = await prisma.inventoryItem.findUnique({
-            where: { id: Number(item.itemId) }
+            where: { id: Number(item.itemId) },
           });
-          
+
           if (!inventoryItem) {
             throw new Error(`Item with ID ${item.itemId} not found`);
           }
-          
+
           if (inventoryItem.stock < Number(item.quantity)) {
-            throw new Error(`Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.stock}, Requested: ${item.quantity}`);
+            throw new Error(
+              `Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.stock}, Requested: ${item.quantity}`
+            );
           }
         }
       }
@@ -101,25 +114,27 @@ router.put('/:id', async (req, res) => {
         data: {
           title,
           description,
+          problemType,
           date: new Date(date),
           statusId: Number(statusId),
           serviceTypeId: Number(serviceTypeId),
-        }
+          equipmentId: equipmentId ? Number(equipmentId) : null,
+        },
       });
 
       // 5. Delete existing items
       await prisma.jobItem.deleteMany({
-        where: { jobId: Number(id) }
+        where: { jobId: Number(id) },
       });
 
       // 6. Create new items and decrement stock
       if (items && items.length > 0) {
         await prisma.jobItem.createMany({
-          data: items.map(item => ({
+          data: items.map((item) => ({
             jobId: Number(id),
             itemId: Number(item.itemId),
-            quantity: Number(item.quantity)
-          }))
+            quantity: Number(item.quantity),
+          })),
         });
 
         // Decrement stock for new items
@@ -128,9 +143,9 @@ router.put('/:id', async (req, res) => {
             where: { id: Number(item.itemId) },
             data: {
               stock: {
-                decrement: Number(item.quantity)
-              }
-            }
+                decrement: Number(item.quantity),
+              },
+            },
           });
         }
       }
@@ -145,23 +160,34 @@ router.put('/:id', async (req, res) => {
 });
 
 // Create a job
-router.post('/', async (req, res) => {
-  const { title, description, date, statusId, serviceTypeId, items } = req.body;
+router.post("/", async (req, res) => {
+  const {
+    title,
+    description,
+    problemType,
+    date,
+    statusId,
+    serviceTypeId,
+    equipmentId,
+    items,
+  } = req.body;
   try {
     const job = await prisma.$transaction(async (prisma) => {
       // 1. Validate stock availability for all items
       if (items && items.length > 0) {
         for (const item of items) {
           const inventoryItem = await prisma.inventoryItem.findUnique({
-            where: { id: Number(item.itemId) }
+            where: { id: Number(item.itemId) },
           });
-          
+
           if (!inventoryItem) {
             throw new Error(`Item with ID ${item.itemId} not found`);
           }
-          
+
           if (inventoryItem.stock < Number(item.quantity)) {
-            throw new Error(`Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.stock}, Requested: ${item.quantity}`);
+            throw new Error(
+              `Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.stock}, Requested: ${item.quantity}`
+            );
           }
         }
       }
@@ -171,16 +197,18 @@ router.post('/', async (req, res) => {
         data: {
           title,
           description,
+          problemType,
           date: new Date(date),
           statusId: Number(statusId),
           serviceTypeId: Number(serviceTypeId),
+          equipmentId: equipmentId ? Number(equipmentId) : null,
           itemsUsed: {
-            create: items.map(item => ({
+            create: items.map((item) => ({
               item: { connect: { id: Number(item.itemId) } },
-              quantity: Number(item.quantity)
-            }))
-          }
-        }
+              quantity: Number(item.quantity),
+            })),
+          },
+        },
       });
 
       // 3. Decrement stock for each item used
@@ -190,9 +218,9 @@ router.post('/', async (req, res) => {
             where: { id: Number(item.itemId) },
             data: {
               stock: {
-                decrement: Number(item.quantity)
-              }
-            }
+                decrement: Number(item.quantity),
+              },
+            },
           });
         }
       }

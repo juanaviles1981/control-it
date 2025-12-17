@@ -6,6 +6,8 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
+import { motion } from "framer-motion";
+
 const JobBoard = () => {
   const [jobs, setJobs] = useState([]);
   const [filterText, setFilterText] = useState("");
@@ -130,6 +132,26 @@ const JobBoard = () => {
       ),
     },
     {
+      name: "Tipo Problema",
+      selector: (row) => row.problemType,
+      sortable: true,
+      cell: (row) => (
+        <span
+          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+            row.problemType === "Hardware"
+              ? "bg-red-100 text-red-800"
+              : row.problemType === "Software"
+              ? "bg-blue-100 text-blue-800"
+              : row.problemType === "Usuario"
+              ? "bg-yellow-100 text-yellow-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {row.problemType || "-"}
+        </span>
+      ),
+    },
+    {
       name: "Estado",
       selector: (row) => row.status?.name,
       sortable: true,
@@ -137,6 +159,18 @@ const JobBoard = () => {
         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
           {row.status?.name || "Sin estado"}
         </span>
+      ),
+    },
+    {
+      name: "Equipo",
+      selector: (row) => row.equipment?.name,
+      sortable: true,
+      cell: (row) => (
+        <div className="text-sm text-gray-700">
+          {row.equipment
+            ? `${row.equipment.name} (${row.equipment.anydeskNumber})`
+            : "-"}
+        </div>
       ),
     },
     {
@@ -224,7 +258,12 @@ const JobBoard = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col"
+    >
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
           Trabajos
@@ -306,7 +345,7 @@ const JobBoard = () => {
           pointerOnHover
         />
       </div>
-    </div>
+    </motion.div>
   );
 };
 

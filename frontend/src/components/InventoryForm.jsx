@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { showSuccessToast, showErrorToast } from '../utils/notifications';
-import { apiRequest } from '../utils/api';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { showSuccessToast, showErrorToast } from "../utils/notifications";
+import { apiRequest } from "../utils/api";
+
+import { motion } from "framer-motion";
 
 const InventoryForm = () => {
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const [stock, setStock] = useState(0);
   const [minStock, setMinStock] = useState(5);
 
@@ -20,42 +22,54 @@ const InventoryForm = () => {
       description,
       category,
       stock: Number(stock),
-      minStock: Number(minStock)
+      minStock: Number(minStock),
     };
 
     try {
-      const response = await apiRequest('/inventory', {
-        method: 'POST',
+      const response = await apiRequest("/inventory", {
+        method: "POST",
         body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        showSuccessToast('Ítem agregado exitosamente');
-        navigate('/inventory');
+        showSuccessToast("Ítem agregado exitosamente");
+        navigate("/inventory");
       } else {
         const error = await response.json();
-        showErrorToast(error.error || 'No se pudo agregar el ítem');
+        showErrorToast(error.error || "No se pudo agregar el ítem");
       }
     } catch (error) {
-      console.error('Error adding item:', error);
-      showErrorToast('Ocurrió un error inesperado al agregar el ítem');
+      console.error("Error adding item:", error);
+      showErrorToast("Ocurrió un error inesperado al agregar el ítem");
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-4xl mx-auto"
+    >
       <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-2xl border border-white/50 overflow-hidden transition-all duration-300 hover:shadow-indigo-500/10">
         <div className="px-8 py-6 border-b border-gray-200/50 bg-white/40">
           <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
             Nuevo Ítem de Inventario
           </h3>
-          <p className="mt-1 text-sm text-gray-500">Agregue un nuevo ítem al inventario.</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Agregue un nuevo ítem al inventario.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-8">
           <div className="grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-6">
             <div className="sm:col-span-4">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Nombre
+              </label>
               <input
                 type="text"
                 name="name"
@@ -69,7 +83,12 @@ const InventoryForm = () => {
             </div>
 
             <div className="sm:col-span-6">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Descripción
+              </label>
               <textarea
                 id="description"
                 name="description"
@@ -82,7 +101,12 @@ const InventoryForm = () => {
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Categoría
+              </label>
               <input
                 type="text"
                 name="category"
@@ -95,7 +119,12 @@ const InventoryForm = () => {
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-2">Stock Inicial</label>
+              <label
+                htmlFor="stock"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Stock Inicial
+              </label>
               <input
                 type="number"
                 name="stock"
@@ -109,7 +138,12 @@ const InventoryForm = () => {
             </div>
 
             <div className="sm:col-span-2">
-              <label htmlFor="minStock" className="block text-sm font-medium text-gray-700 mb-2">Stock Mínimo</label>
+              <label
+                htmlFor="minStock"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Stock Mínimo
+              </label>
               <input
                 type="number"
                 name="minStock"
@@ -126,7 +160,7 @@ const InventoryForm = () => {
           <div className="pt-6 border-t border-gray-200/50 flex justify-end gap-3">
             <button
               type="button"
-              onClick={() => navigate('/inventory')}
+              onClick={() => navigate("/inventory")}
               className="px-6 py-2.5 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
             >
               Cancelar
@@ -140,7 +174,7 @@ const InventoryForm = () => {
           </div>
         </form>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

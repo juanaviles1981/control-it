@@ -7,6 +7,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Swal from "sweetalert2";
 
+import { motion } from "framer-motion";
+
 const InventoryTable = () => {
   const [inventory, setInventory] = useState([]);
   const [filterText, setFilterText] = useState("");
@@ -259,8 +261,9 @@ const InventoryTable = () => {
       sortable: true,
       cell: (row) => (
         <div
-          className={`text-sm font-semibold ${row.stock <= row.minStock ? "text-red-600" : "text-gray-900"
-            }`}
+          className={`text-sm font-semibold ${
+            row.stock <= row.minStock ? "text-red-600" : "text-gray-900"
+          }`}
         >
           {row.stock}
         </div>
@@ -350,7 +353,12 @@ const InventoryTable = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col"
+    >
       <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
           Inventario
@@ -432,7 +440,7 @@ const InventoryTable = () => {
           pointerOnHover
         />
       </div>
-    </div>
+    </motion.div>
   );
 };
 
